@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <extension key="net.ourpowerbase.exportpermission" type="module">
   <file>exportpermission</file>
-  <name>Export Permissions</name>
-  <description>Export Permissions creates permissions for export - without this permission the export option is not available.</description>
+  <name>Export Permission</name>
+  <description>Export Permission creates a permission for export - without this permission the export option is not available from the search actions menu.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Jamie McClelland</author>
-    <email>jm@mayfirst.org</email>
+    <email>jamie@progressivetech.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/progressivetech/net.ourpowerbase.exportpermission</url>
+    <url desc="Documentation">https://github.com/progressivetech/net.ourpowerbase.exportpermission/blob/master/README.md</url>
+    <url desc="Support">https://github.com/progressivetech/net.ourpowerbase.exportpermission/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2017-02-27</releaseDate>
