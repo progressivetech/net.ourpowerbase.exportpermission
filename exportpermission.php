@@ -17,23 +17,9 @@ function exportpermission_civicrm_searchTasks($objectName, &$tasks) {
     // If they have the proper permission, return without doing anything.
     return;
   }
-  // $tasks is not properly keyed, so we have to iterate over all of them to find
-  // any permissions that involve an export form.
-  reset($tasks);
-  while(list($k, $value) = each($tasks)) {
-    $regexp = '/^CRM_Export_Form/';
-    if(is_array($value['class'])) {
-      if(preg_grep($regexp, $value['class'])) {
-        unset($tasks[$k]);
-      }
-    }
-    elseif(preg_match($regexp, $value['class'])) {
-      unset($tasks[$k]);
-    }
-  }
-  reset($tasks);
+  unset($tasks[CRM_Core_Task::TASK_EXPORT]);
 }
-  
+
 /**
  * Implements hook_civicrm_config().
  *
