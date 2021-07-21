@@ -14,9 +14,10 @@ When this extension is enabled, users that are not explicitly granted this
 permission do not see the export options listed in the "Actions" dropdown for Searches/Reports.
 
 ### Warning:
-This extension does not technically prevent a user from
-exporting a CiviCRM database, it *only* removes that option from the Actions
-drop down list. Enterprising hackers can figure out ways to convince CiviCRM to
+This extension removes the export options from the actions menu and removes access to most of
+the export forms but there will always be ways to extract the data.
+
+Enterprising hackers can figure out ways to convince CiviCRM to
 provide the export. Additionally, any user that can view all Contacts can
 export the data one way or another - even if it means copy and pasting from
 each screen.
