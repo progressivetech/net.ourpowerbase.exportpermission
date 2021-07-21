@@ -1,24 +1,11 @@
 <?php
 
 define('EXPORT_PERMISSION_NAME', 'access export menu');
+define('PDF_PERMISSION_NAME', 'access pdf menu');
+define('PRINT_PERMISSION_NAME', 'access print menu');
 
 require_once 'exportpermission.civix.php';
-
-function exportpermission_civicrm_permission(&$permissions) {
-  $prefix = ts('CiviCRM Export Permissions') . ': ';
-  $permissions[EXPORT_PERMISSION_NAME] = array(
-    $prefix . ts('access export menu'),
-    ts('Access export drop down menu item from actions menu after search'),
-  );
-}
-
-function exportpermission_civicrm_searchTasks($objectName, &$tasks) {
-  if (CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)) {
-    // If they have the proper permission, return without doing anything.
-    return;
-  }
-  unset($tasks[CRM_Core_Task::TASK_EXPORT]);
-}
+use CRM_Exportpermission_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -102,30 +89,66 @@ function exportpermission_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
   _exportpermission_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
+/**
+ * Implements hook_civicrm_permission().
+ *
+ * @see CRM_Utils_Hook::permission()
+ * @param array $permissions
+ */
+function exportpermission_civicrm_permission(&$permissions) {
+  $permissions[EXPORT_PERMISSION_NAME] = [
+    E::ts('CiviCRM Export Permissions') . ': ' . E::ts('access export menu'),
+    E::ts('Access "Export as CSV" drop down menu item from actions menu on after search/report'),
+  ];
+  $permissions[PRINT_PERMISSION_NAME] = [
+    E::ts('CiviCRM Export Permissions') . ': ' . E::ts('access print menu'),
+    E::ts('Access "Print" drop down menu item from actions menu on search/report'),
+  ];
+  $permissions[PDF_PERMISSION_NAME] = [
+    E::ts('CiviCRM Export Permissions') . ': ' . E::ts('access print pdf menu'),
+    E::ts('Access "Print/Merge document (PDF Letter)" drop down menu item from actions menu on search/report'),
+  ];
+}
 
 /**
- * Implements hook_civicrm_preProcess().
+ * Implements hook_civicrm_searchTasks();
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function exportpermission_civicrm_preProcess($formName, &$form) {
-
-} // */
+ * @param string $objectName
+ * @param array $tasks
+ */
+function exportpermission_civicrm_searchTasks($objectName, &$tasks) {
+  if (!CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)) {
+    unset($tasks[CRM_Core_Task::TASK_EXPORT]);
+  }
+  if (!CRM_Core_Permission::check(PDF_PERMISSION_NAME)) {
+    unset($tasks[CRM_Core_Task::PDF_LETTER]);
+  }
+  if (!CRM_Core_Permission::check(PRINT_PERMISSION_NAME)) {
+    unset($tasks[CRM_Core_Task::TASK_PRINT]);
+  }
+}
 
 /**
- * Implements hook_civicrm_navigationMenu().
+ * Implementation of hook_civicrm_alterReportVar
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
+ * @param string $varType
+ * @param array $var
+ * @param CRM_Report_Form $reportForm
  *
-function exportpermission_civicrm_navigationMenu(&$menu) {
-  _exportpermission_civix_insert_navigation_menu($menu, NULL, array(
-    'label' => ts('The Page', array('domain' => 'net.ourpowerbase.exportpermission')),
-    'name' => 'the_page',
-    'url' => 'civicrm/the-page',
-    'permission' => 'access CiviReport,access CiviContribute',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _exportpermission_civix_navigationMenu($menu);
-} // */
+ */
+function exportpermission_civicrm_alterReportVar($varType, &$var, $reportForm) {
+  switch ($varType) {
+    case 'actions':
+      if (!CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)) {
+        unset($var['report_instance.csv']);
+      }
+      if (!CRM_Core_Permission::check(PDF_PERMISSION_NAME)) {
+        unset($var['report_instance.pdf']);
+      }
+      if (!CRM_Core_Permission::check(PRINT_PERMISSION_NAME)) {
+        unset($var['report_instance.print']);
+      }
+      break;
+  }
+
+}
