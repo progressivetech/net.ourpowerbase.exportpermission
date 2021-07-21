@@ -3,6 +3,7 @@
 define('EXPORT_PERMISSION_NAME', 'access export menu');
 define('PDF_PERMISSION_NAME', 'access pdf menu');
 define('PRINT_PERMISSION_NAME', 'access print menu');
+define('LABEL_PERMISSION_NAME', 'access mailing labels menu');
 
 require_once 'exportpermission.civix.php';
 use CRM_Exportpermission_ExtensionUtil as E;
@@ -108,6 +109,10 @@ function exportpermission_civicrm_permission(&$permissions) {
     E::ts('CiviCRM Export Permissions') . ': ' . E::ts('access print pdf menu'),
     E::ts('Access "Print/Merge document (PDF Letter)" drop down menu item from actions menu on search/report'),
   ];
+  $permissions[LABEL_PERMISSION_NAME] = [
+    E::ts('CiviCRM Export Permissions') . ': ' . E::ts('access mailing labels menu'),
+    E::ts('Access "Print Mailing Labels" drop down menu item from actions menu on search/report'),
+  ];
 }
 
 /**
@@ -126,10 +131,13 @@ function exportpermission_civicrm_searchTasks($objectName, &$tasks) {
   if (!CRM_Core_Permission::check(PRINT_PERMISSION_NAME)) {
     unset($tasks[CRM_Core_Task::TASK_PRINT]);
   }
+  if (!CRM_Core_Permission::check(LABEL_PERMISSION_NAME)) {
+    unset($tasks[CRM_Core_Task::LABEL_CONTACTS]);
+  }
 }
 
 /**
- * Implementation of hook_civicrm_alterReportVar
+ * Implementation of hook_civicrm_alterReportVar()
  *
  * @param string $varType
  * @param array $var
@@ -150,5 +158,35 @@ function exportpermission_civicrm_alterReportVar($varType, &$var, $reportForm) {
       }
       break;
   }
-
 }
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @param string $formName
+ * @param CRM_Core_Form $form
+ */
+function exportpermission_civicrm_buildForm($formName, &$form) {
+  // Check for permissions and return permission denied if user tries to access
+  //   forms directly and don't have permission.
+  // Note: This relies on matching form names and may not include all forms.
+  if (!CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)
+    && (strstr($formName, 'Export_Form') === FALSE)) {
+    return;
+  }
+  if (!CRM_Core_Permission::check(PRINT_PERMISSION_NAME)
+    && (strstr($formName, 'Task_Print') === FALSE)) {
+    return;
+  }
+  if (!CRM_Core_Permission::check(PDF_PERMISSION_NAME)
+    && (strstr($formName, 'Task_PDF') === FALSE)) {
+    return;
+  }
+  if (!CRM_Core_Permission::check(LABEL_PERMISSION_NAME)
+    && (strstr($formName, 'Task_Label') === FALSE)) {
+    return;
+  }
+
+  CRM_Core_Error::statusBounce(E::ts('You do not have permission to access this page.'));
+}
+
