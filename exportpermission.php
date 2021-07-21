@@ -167,26 +167,25 @@ function exportpermission_civicrm_alterReportVar($varType, &$var, $reportForm) {
  * @param CRM_Core_Form $form
  */
 function exportpermission_civicrm_buildForm($formName, &$form) {
+  $bounce = FALSE;
   // Check for permissions and return permission denied if user tries to access
   //   forms directly and don't have permission.
   // Note: This relies on matching form names and may not include all forms.
-  if (!CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)
-    && (strstr($formName, 'Export_Form') === FALSE)) {
-    return;
+  if (strstr($formName, 'Export_Form') && !CRM_Core_Permission::check(EXPORT_PERMISSION_NAME)) {
+    $bounce = TRUE;
   }
-  if (!CRM_Core_Permission::check(PRINT_PERMISSION_NAME)
-    && (strstr($formName, 'Task_Print') === FALSE)) {
-    return;
+  elseif (strstr($formName, 'Task_Print') && !CRM_Core_Permission::check(PRINT_PERMISSION_NAME)) {
+    $bounce = TRUE;
   }
-  if (!CRM_Core_Permission::check(PDF_PERMISSION_NAME)
-    && (strstr($formName, 'Task_PDF') === FALSE)) {
-    return;
+  elseif (strstr($formName, 'Task_PDF') && !CRM_Core_Permission::check(PDF_PERMISSION_NAME)) {
+    $bounce = TRUE;
   }
-  if (!CRM_Core_Permission::check(LABEL_PERMISSION_NAME)
-    && (strstr($formName, 'Task_Label') === FALSE)) {
-    return;
+  elseif (strstr($formName, 'Task_Label') && !CRM_Core_Permission::check(LABEL_PERMISSION_NAME)) {
+    $bounce = TRUE;
   }
 
-  CRM_Core_Error::statusBounce(E::ts('You do not have permission to access this page.'));
+  if ($bounce) {
+    CRM_Core_Error::statusBounce(E::ts('You do not have permission to access this page.'));
+  }
 }
 
